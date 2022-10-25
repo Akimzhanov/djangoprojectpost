@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from slugify import slugify
-
+from .utils import get_time
 
 User = get_user_model()
 
@@ -40,7 +40,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title + get_time())
         super().save(*args, **kwargs)
 
     class Meta:
@@ -53,3 +53,60 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.title
+
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='comment'
+    )
+    post = models.ForeignKey(
+        to=Post,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'Comment from {self.user.username} to {self.post.title}'
+
+
+class Rating(models.Model):
+    ONE = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+    RATING_CHOICES = (
+        (ONE, '1'),
+        (TWO, '2'),
+        (THREE, '3'),
+        (FOUR, '4'),
+        (FIVE, '5')
+    )
+
+
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='ratings'
+    )
+
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES, blank=True, null=True)
+    post = models.ForeignKey(
+        to=Post,
+        on_delete=models.CASCADE,
+        related_name='ratings'
+    )
+
+    def __str__(self) -> str:
+        return str(self.rating)
+
+
+
+
+
+
