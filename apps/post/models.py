@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.urls import reverse
+
+
 from slugify import slugify
 from .utils import get_time
 
@@ -28,8 +31,8 @@ class Post(models.Model):
         choices=STATUS_CHOICES, 
         default='draft')
     tag = models.ManyToManyField(
-        to='Tag',
-        related_name='publications',
+        to='Tag',      # для поиска класса который нужен, ссылка 
+        related_name='publications', # привязка 
         blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -45,6 +48,17 @@ class Post(models.Model):
 
     class Meta:
         ordering = ('created_at', )
+
+    def get_absolute_url(self):
+        return reverse("post-detail", kwargs={"pk": self.pk})
+
+class PostImage(models.Model):
+    image = models.ImageField(upload_to='post_images/carousel')
+    post = models.ForeignKey(
+        to=Post,
+        on_delete=models.CASCADE,
+        related_name='post_images'
+    )
 
 
 class Tag(models.Model):
@@ -104,6 +118,30 @@ class Rating(models.Model):
 
     def __str__(self) -> str:
         return str(self.rating)
+
+
+class Like(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+    post = models.ForeignKey(
+        to=Post,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+
+
+    def __str__(self) -> str:
+        return f'Liked by {self.user.username}'
+
+
+
+
+
+
+
 
 
 

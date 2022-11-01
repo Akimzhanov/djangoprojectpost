@@ -1,11 +1,12 @@
 wheel
 djangorestframework
-django-filter
+django-filter  для фильтрации
 # swagger
-drf-yasg
-djangorestframework-simplejwt
+drf-yasg  для свагеров(документации)
+djangorestframework-simplejwt  для токенов
 python-decouple
 Pillow
 psycopg2-binary
-python-slugify
-celery
+python-slugify  для слагов
+celery  для быстрой отправки всего 
+redis
